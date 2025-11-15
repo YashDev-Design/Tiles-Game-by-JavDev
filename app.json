@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Tiles Quest",
+    "slug": "tiles-quest",
+    "scheme": "tilesquest",
+    "orientation": "portrait",
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
