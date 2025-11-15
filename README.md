@@ -1,73 +1,105 @@
 # 🎮 Tiles Game by JavDev (Yash)  
-A polished, fully‑interactive memory puzzle game built with **React Native + Expo** featuring modern UI, sound design, animations, auto‑save, and theme support.
-
-## ✨ Current Features (Fully Implemented)
-
-### 🧩 Core Gameplay  
-- Flip tiles to find matching pairs  
-- Smooth tile flip animations  
-- Timer countdown  
-- Step counter  
-- Confetti celebration on win  
-- Auto-clear saved game on win/reset  
-
-### 🔊 Sound System  
-- iOS‑style **click sound** for all UI buttons, toggles, back arrows  
-- **Match sound** when each tile flips  
-- **Win sound** synced with confetti  
-- Haptic feedback for all SFX  
-- Global SFX ON/OFF toggle  
-- Stable-safe audio playback (no “seeking interrupted” errors)  
-
-### 🎵 Background Music  
-- Smooth fading background music  
-- Volume slider  
-- Music ON/OFF toggle  
-- Auto-save settings using AsyncStorage  
-
-### 💾 Auto Save & Continue  
-- Game auto-saves after every move, match, mismatch, and reset  
-- Home screen shows **Continue Game** if a saved game exists  
-- Restores:
-  - numbers  
-  - flipped state  
-  - matched tiles  
-  - steps  
-  - timer  
-  - difficulty mode  
-
-### 🎨 Theme System  
-- Menu toggle for **Light / Dark** theme  
-- Theme saved permanently using AsyncStorage  
-
-### 🧭 Navigation  
-- Home Screen  
-- Difficulty Selection  
-- Game Screen  
-- Settings Screen  
+A fast, modern, difficulty‑adaptive memory puzzle game built with **React Native + Expo**, featuring dynamic grids, difficulty modes, animations, sound design, haptics, and a brand‑new SUPER HARD mode.
 
 ---
 
-## 📁 Project Structure
+# ✨ Latest Features (Updated)
+
+## 🧩 Core Gameplay  
+- Flip tiles to match identical pairs  
+- Smooth tile flip animations  
+- **Dynamic grid sizes based on difficulty:**
+  - EASY → **2×2** (4 tiles)
+  - MEDIUM → **4×4** (16 tiles)
+  - HARD → **6×6** (36 tiles)
+  - SUPER HARD → **9×9** (81 tiles, separate screen)
+- Step counter  
+- Clean UI layout auto-adjusts for every grid size  
+
+---
+
+## 🔥 SUPER HARD MODE (New)  
+A separate ultra‑challenging mode:
+- **9×9 grid** (81 tiles)
+- **100‑second countdown timer**
+- Timer counts **down to 0**
+- Auto-reset logic
+- Optimized layout for large tile grids
+- Back arrow safely resets timer + returns to home screen
+
+This mode does NOT affect normal difficulty gameplay.
+
+---
+
+## 🔊 Sound & Haptics  
+- iOS‑style click sound for all UI interactions  
+- Match sound on tile flip  
+- Win sound synced with confetti  
+- Haptic feedback for tile interactions  
+- SFX toggle (internally stored via AsyncStorage)  
+- Background music system with:
+  - ON/OFF toggle  
+  - Volume slider  
+  - Smooth fade in/out transitions  
+
+---
+
+## 🎵 Background Music  
+- Plays automatically by default  
+- Respects music volume from AsyncStorage  
+- Smooth fade‑out on game exit  
+- SFX & BGM logic fixed across screens  
+- Safe playback (no “seeking interrupted” issues)
+
+---
+
+## 🎉 Animations  
+- Confetti celebration on win  
+- Lottie-driven win screen  
+- Back button + UI elements support sound + haptics  
+- Adaptive number sizing (font scale changes based on tile size)
+
+---
+
+## 🧭 Navigation Flow  
+- **Home Screen**
+  - New Game  
+  - Difficulty Modes  
+  - Super Hard Mode  
+- **Difficulty Screen**
+  - EASY → 2×2  
+  - MEDIUM → 4×4  
+  - HARD → 6×6  
+  - SUPER HARD → external screen  
+- **Game Screen**
+  - Dynamic grid rendering  
+  - Timer  
+  - Reset  
+  - Back arrow → always routes safely to home  
+- **Super Hard Screen**
+  - Dedicated 9×9 grid  
+  - Countdown timer  
+  - Extreme challenge  
+
+---
+
+## 📁 Updated Project Structure
 
 ```
 /app
   home.jsx
   difficulty.jsx
-  settings.jsx
-  game.jsx
+  superhard.jsx
+  win.jsx
 /components
   TilesGame.jsx
 /assets
-  /sounds
-    click.wav
-    match.wav
-    confetti-pop.mp3
-  /images …
+  /sounds (click.wav, match.wav, confetti-pop.mp3)
+  /images (backgrounds, icons)
 /hooks
   useBackgroundMusic.js
 /context
-  Audio settings (optional future expansion)
+  (reserved for future global audio/theme expansion)
 ```
 
 ---
@@ -84,10 +116,10 @@ npm install
 npx expo start
 ```
 
-3. Open on:
+3. Open using:
 - iOS Simulator  
 - Android Emulator  
-- Expo Go app  
+- Expo Go App  
 
 ---
 
@@ -98,21 +130,22 @@ npx expo start
 - Expo AV  
 - Expo Haptics  
 - AsyncStorage  
-- Lottie / Confetti  
-- GitHub for version control  
+- Lottie  
+- Confetti  
+- GitHub  
 
 ---
 
-## 📌 Upcoming Enhancements  
-- Theme engine for tiles + board  
-- Pause/Resume gameplay  
-- Leaderboard (Best Time / Best Steps)  
-- Additional animations  
+## 📌 New Roadmap  
+- Auto-fail popup when super hard timer hits 0  
+- Themed backgrounds per difficulty level  
+- Leaderboard system (best time / best steps)  
+- New tile textures + animations  
+- Save system rework (optional future return)
 
 ---
 
 ## 👨‍💻 Developed by  
 **Yash (JavDev)**  
-AUM Graduate Student • Full‑Stack Mobile Developer • UI/UX Focus  
-https://github.com/YashDev-Design
-
+Graduate Student @ AUM • Full‑Stack Mobile Developer • UI/UX Specialist  
+GitHub: https://github.com/YashDev-Design
