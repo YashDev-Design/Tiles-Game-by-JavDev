@@ -36,8 +36,15 @@ export default function Tiles({ difficulty: difficultyOverride }) {
   const { width, height } = screen;
   const columns = Math.ceil(Math.sqrt(n)); // approximate square grid
   const rows = Math.ceil(n / columns);
-  const horizontalPadding = 40; // adjust to fit padding/margins
-  const verticalPadding = 140; // reduced padding for better centering of tiles
+  let horizontalPadding = 40;
+  let verticalPadding = 140;
+
+  // Adjust layout specifically for EASY 2×2 mode
+  if (gridSide === 2) {
+    horizontalPadding = 80;     // wider padding to center grid
+    verticalPadding = 300;      // pushes grid downward for better vertical centering
+  }
+
   const tileSize = Math.min(
     (width - horizontalPadding) / columns,
     (height - verticalPadding) / rows

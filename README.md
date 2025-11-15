@@ -1,25 +1,70 @@
-# 🎮 Tiles Game by JavDev (Yash)  
+# 🎮 Tiles Game by JavDev (Yash)
+
 A fast, modern, difficulty‑adaptive memory puzzle game built with **React Native + Expo**, featuring dynamic grids, difficulty modes, animations, sound design, haptics, and a brand‑new SUPER HARD mode.
 
 ---
 
+# 🖼️ Screenshots
+
+Below are sample preview sections.  
+Replace the placeholder paths with your actual screenshot filenames inside `assets/images/` or wherever you store them.
+
+### 🏠 Home Screen
+
+![Home Screen](assets/images/screenshot-home.png)
+
+### 🎯 Difficulty Selection
+
+![Difficulty Screen](assets/images/screenshot-difficulty.png)
+
+### 🎯 Difficulty EASY
+
+![Difficulty Screen](assets/images/screenshot-easy.png)
+
+### 🎯 Difficulty MEDIUM
+
+![Difficulty Screen](assets/images/screenshot-medium.png)
+
+### 🎯 Difficulty HARD
+
+![Difficulty Screen](assets/images/screenshot-hard.png)
+
+### 🎮 Game Screen (Example)
+
+![Game Screen](assets/images/screenshot-game.png)
+
+### 🔥 Super Hard Mode (9×9)
+
+![Super Hard Mode](assets/images/screenshot-superhard.png)
+
+### 🎉 Win Screen
+
+![Win Screen](assets/images/screenshot-confetti.png)
+
+### 🎉 Win Summary Screen
+
+![Win Summary Screen](assets/images/screenshot-win.png)
+
 # ✨ Latest Features (Updated)
 
-## 🧩 Core Gameplay  
-- Flip tiles to match identical pairs  
-- Smooth tile flip animations  
+## 🧩 Core Gameplay
+
+- Flip tiles to match identical pairs
+- Smooth tile flip animations
 - **Dynamic grid sizes based on difficulty:**
   - EASY → **2×2** (4 tiles)
   - MEDIUM → **4×4** (16 tiles)
   - HARD → **6×6** (36 tiles)
   - SUPER HARD → **9×9** (81 tiles, separate screen)
-- Step counter  
-- Clean UI layout auto-adjusts for every grid size  
+- Step counter
+- Clean UI layout auto-adjusts for every grid size
 
 ---
 
-## 🔥 SUPER HARD MODE (New)  
+## 🔥 SUPER HARD MODE (New)
+
 A separate ultra‑challenging mode:
+
 - **9×9 grid** (81 tiles)
 - **100‑second countdown timer**
 - Timer counts **down to 0**
@@ -31,55 +76,59 @@ This mode does NOT affect normal difficulty gameplay.
 
 ---
 
-## 🔊 Sound & Haptics  
-- iOS‑style click sound for all UI interactions  
-- Match sound on tile flip  
-- Win sound synced with confetti  
-- Haptic feedback for tile interactions  
-- SFX toggle (internally stored via AsyncStorage)  
+## 🔊 Sound & Haptics
+
+- iOS‑style click sound for all UI interactions
+- Match sound on tile flip
+- Win sound synced with confetti
+- Haptic feedback for tile interactions
+- SFX toggle (internally stored via AsyncStorage)
 - Background music system with:
-  - ON/OFF toggle  
-  - Volume slider  
-  - Smooth fade in/out transitions  
+  - ON/OFF toggle
+  - Volume slider
+  - Smooth fade in/out transitions
 
 ---
 
-## 🎵 Background Music  
-- Plays automatically by default  
-- Respects music volume from AsyncStorage  
-- Smooth fade‑out on game exit  
-- SFX & BGM logic fixed across screens  
+## 🎵 Background Music
+
+- Plays automatically by default
+- Respects music volume from AsyncStorage
+- Smooth fade‑out on game exit
+- SFX & BGM logic fixed across screens
 - Safe playback (no “seeking interrupted” issues)
 
 ---
 
-## 🎉 Animations  
-- Confetti celebration on win  
-- Lottie-driven win screen  
-- Back button + UI elements support sound + haptics  
+## 🎉 Animations
+
+- Confetti celebration on win
+- Lottie-driven win screen
+- Back button + UI elements support sound + haptics
 - Adaptive number sizing (font scale changes based on tile size)
 
 ---
 
-## 🧭 Navigation Flow  
+## 🧭 Navigation Flow
+
 - **Home Screen**
-  - New Game  
-  - Difficulty Modes  
-  - Super Hard Mode  
+  - New Game
+  - Difficulty Modes
+  - Super Hard Mode
 - **Difficulty Screen**
-  - EASY → 2×2  
-  - MEDIUM → 4×4  
-  - HARD → 6×6  
-  - SUPER HARD → external screen  
+  - EASY → 2×2
+  - MEDIUM → 4×4
+  - HARD → 6×6
+  - SUPER HARD → external screen
 - **Game Screen**
-  - Dynamic grid rendering  
-  - Timer  
-  - Reset  
-  - Back arrow → always routes safely to home  
+  - Dynamic grid rendering
+  - Timer
+  - Reset
+  - Back arrow → always routes safely to home
 - **Super Hard Screen**
-  - Dedicated 9×9 grid  
-  - Countdown timer  
-  - Extreme challenge  
+  - Dedicated 9×9 grid
+  - Countdown timer
+  - Extreme challenge
 
 ---
 
@@ -107,45 +156,51 @@ This mode does NOT affect normal difficulty gameplay.
 ## 🚀 How to Run the Project
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Start development server:
+
 ```bash
 npx expo start
 ```
 
 3. Open using:
-- iOS Simulator  
-- Android Emulator  
-- Expo Go App  
+
+- iOS Simulator
+- Android Emulator
+- Expo Go App
 
 ---
 
-## 🛠 Technologies Used  
-- React Native  
-- Expo  
-- Expo Router  
-- Expo AV  
-- Expo Haptics  
-- AsyncStorage  
-- Lottie  
-- Confetti  
-- GitHub  
+## 🛠 Technologies Used
+
+- React Native
+- Expo
+- Expo Router
+- Expo AV
+- Expo Haptics
+- AsyncStorage
+- Lottie
+- Confetti
+- GitHub
 
 ---
 
-## 📌 New Roadmap  
-- Auto-fail popup when super hard timer hits 0  
-- Themed backgrounds per difficulty level  
-- Leaderboard system (best time / best steps)  
-- New tile textures + animations  
+## 📌 New Roadmap
+
+- Auto-fail popup when super hard timer hits 0
+- Themed backgrounds per difficulty level
+- Leaderboard system (best time / best steps)
+- New tile textures + animations
 - Save system rework (optional future return)
 
 ---
 
-## 👨‍💻 Developed by  
+## 👨‍💻 Developed by
+
 **Yash (JavDev)**  
 Graduate Student @ AUM • Full‑Stack Mobile Developer • UI/UX Specialist  
 GitHub: https://github.com/YashDev-Design
