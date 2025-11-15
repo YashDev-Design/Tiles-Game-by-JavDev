@@ -75,7 +75,7 @@ export default function HomeScreen() {
           style={styles.button}
           onPress={() => { 
             playClick(); 
-            router.push({ pathname: "/tiles", params: { difficulty: "easy" } }); 
+            router.push({ pathname: "/tiles", params: { difficulty: "easy2" } }); 
           }}
         >
           <Text style={styles.buttonText}>EASY</Text>
@@ -85,7 +85,7 @@ export default function HomeScreen() {
           style={styles.button}
           onPress={() => { 
             playClick(); 
-            router.push({ pathname: "/tiles", params: { difficulty: "medium" } }); 
+            router.push({ pathname: "/tiles", params: { difficulty: "medium4" } }); 
           }}
         >
           <Text style={styles.buttonText}>MEDIUM</Text>
@@ -95,10 +95,20 @@ export default function HomeScreen() {
           style={styles.button}
           onPress={() => { 
             playClick(); 
-            router.push({ pathname: "/tiles", params: { difficulty: "hard" } }); 
+            router.push({ pathname: "/tiles", params: { difficulty: "hard6" } }); 
           }}
         >
           <Text style={styles.buttonText}>HARD</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.button}
+          onPress={() => { 
+            playClick(); 
+            router.push({ pathname: "/superhard" });
+          }}
+        >
+          <Text style={styles.buttonText}>SUPER HARD</Text>
         </Pressable>
       </View>
     </ImageBackground>

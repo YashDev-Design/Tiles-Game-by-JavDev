@@ -1,9 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert,
+  Animated,
   Dimensions,
+  Easing,
   ImageBackground,
   Pressable,
   StyleSheet,
@@ -12,17 +15,20 @@ import {
 } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useTheme } from "../context/ThemeContext";
-import { Audio } from "expo-av";
-import * as Haptics from "expo-haptics";
 
-export default function Tiles() {
+export default function Tiles({ difficulty: difficultyOverride }) {
   const { theme } = useTheme();
   const router = useRouter();
-  const { difficulty } = useLocalSearchParams();
-  const { continueGame } = useLocalSearchParams();
-  let gridSide = 3;
-  if (difficulty === "medium") gridSide = 5;
-  if (difficulty === "hard") gridSide = 9;
+  const params = useLocalSearchParams();
+  const difficulty = difficultyOverride || params.difficulty || "easy";
+  const isSuperHard = difficulty === "superhard";
+  let gridSide = 2;
+
+  // New explicit difficulty mappings
+  if (difficulty === "easy2") gridSide = 2;
+  else if (difficulty === "medium4") gridSide = 4;
+  else if (difficulty === "hard6") gridSide = 6;
+  else if (isSuperHard) gridSide = 9;
   const n = gridSide * gridSide;
   const uniqueCount = Math.floor(n / 2);
   const screen = Dimensions.get("window");
@@ -31,7 +37,7 @@ export default function Tiles() {
   const columns = Math.ceil(Math.sqrt(n)); // approximate square grid
   const rows = Math.ceil(n / columns);
   const horizontalPadding = 40; // adjust to fit padding/margins
-  const verticalPadding = 200; // to account for info bar and reset button
+  const verticalPadding = 140; // reduced padding for better centering of tiles
   const tileSize = Math.min(
     (width - horizontalPadding) / columns,
     (height - verticalPadding) / rows
@@ -51,36 +57,38 @@ export default function Tiles() {
   const [matched, setMatched] = useState(Array(numbers.length).fill(false));
   const [openTiles, setOpenTiles] = useState([]);
 
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(isSuperHard ? 100 : 0);
   const [timerActive, setTimerActive] = useState(false);
   const [steps, setSteps] = useState(0);
   const [bestScore, setBestScore] = useState(null);
 
   useEffect(() => {
-    async function loadGame() {
-      if (continueGame !== "true") return;
-
-      try {
-        const saved = await AsyncStorage.getItem("savedGame");
-        if (!saved) return;
-
-        const data = JSON.parse(saved);
-
-        setNumbers(data.numbers);
-        setFlipped(data.flipped);
-        setMatched(data.matched);
-        setSteps(data.steps);
-        setTimeLeft(data.timeLeft);
-        setTimerActive(true);
-      } catch (err) {
-        console.log("Load Error:", err);
-      }
-    }
-
-    loadGame();
+    runBoardAppearAnimation();
   }, []);
 
   const timerRef = useRef(null);
+
+  const boardScale = useRef(new Animated.Value(1)).current;
+  const boardOpacity = useRef(new Animated.Value(1)).current;
+
+  const runBoardAppearAnimation = () => {
+    boardScale.setValue(0.85);
+    boardOpacity.setValue(0);
+    Animated.parallel([
+      Animated.timing(boardScale, {
+        toValue: 1,
+        duration: 300,
+        easing: Easing.out(Easing.back(1.5)),
+        useNativeDriver: true,
+      }),
+      Animated.timing(boardOpacity, {
+        toValue: 1,
+        duration: 220,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -100,17 +108,19 @@ export default function Tiles() {
 
   useEffect(() => {
     async function loadSounds() {
-      clickSound.current = (await Audio.Sound.createAsync(
-        require("../assets/sounds/click.wav")
-      )).sound;
+      clickSound.current = (
+        await Audio.Sound.createAsync(require("../assets/sounds/click.wav"))
+      ).sound;
 
-      matchSound.current = (await Audio.Sound.createAsync(
-        require("../assets/sounds/match.wav")
-      )).sound;
+      matchSound.current = (
+        await Audio.Sound.createAsync(require("../assets/sounds/match.wav"))
+      ).sound;
 
-      winSound.current = (await Audio.Sound.createAsync(
-        require("../assets/sounds/win.wav")
-      )).sound;
+      winSound.current = (
+        await Audio.Sound.createAsync(
+          require("../assets/sounds/confetti-pop.mp3")
+        )
+      ).sound;
     }
     loadSounds();
     return () => {
@@ -123,7 +133,12 @@ export default function Tiles() {
   useEffect(() => {
     if (timerActive) {
       timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => prev + 1);
+        setTimeLeft((prev) => {
+          if (isSuperHard) {
+            return prev > 0 ? prev - 1 : 0;
+          }
+          return prev + 1;
+        });
       }, 1000);
     }
     return () => clearInterval(timerRef.current);
@@ -158,33 +173,6 @@ export default function Tiles() {
     }
   };
 
-  // ---------- AUTO SAVE GAME ----------
-  const saveLock = useRef(false);
-
-  const saveGame = async () => {
-    if (saveLock.current) return;
-    saveLock.current = true;
-
-    const data = {
-      numbers,
-      flipped,
-      matched,
-      steps,
-      timeLeft,
-      difficulty,
-    };
-
-    try {
-      await AsyncStorage.setItem("savedGame", JSON.stringify(data));
-    } catch (err) {
-      console.log("Save Error:", err);
-    }
-
-    setTimeout(() => {
-      saveLock.current = false;
-    }, 300);
-  };
-
   const handleTilePress = (index) => {
     playSfx("click");
     if (!timerActive) {
@@ -194,7 +182,6 @@ export default function Tiles() {
     if (openTiles.length === 2) return;
 
     setSteps((prev) => prev + 1);
-    saveGame();
 
     const newFlipped = [...flipped];
     newFlipped[index] = true;
@@ -213,7 +200,6 @@ export default function Tiles() {
         newMatched[first] = true;
         newMatched[second] = true;
         setMatched(newMatched);
-        saveGame();
         setOpenTiles([]);
 
         // Check for win condition
@@ -230,17 +216,19 @@ export default function Tiles() {
                 await AsyncStorage.setItem("bestScore", score.toString());
                 setBestScore(score);
               }
-              await AsyncStorage.removeItem("savedGame");
             } catch (error) {
               console.error("Error saving score:", error);
             }
 
-            Alert.alert(
-              "🎉 You Won!",
-              `All matching tiles found in ${secondsTaken} seconds with ${steps} steps!\n\n🏆 Score: ${score}\n📊 Best Score: ${
-                bestScore ? bestScore : score
-              }`
-            );
+            router.push({
+              pathname: "/win",
+              params: {
+                score,
+                steps,
+                secondsTaken,
+                difficulty,
+              },
+            });
           }, 5000);
         }
       } else {
@@ -251,17 +239,15 @@ export default function Tiles() {
           resetFlipped[second] = false;
           setFlipped(resetFlipped);
           setOpenTiles([]);
-          saveGame();
         }, 800);
       }
     }
   };
 
   const handleReset = () => {
-    AsyncStorage.removeItem("savedGame");
     clearInterval(timerRef.current);
     setTimerActive(false);
-    setTimeLeft(0);
+    setTimeLeft(isSuperHard ? 100 : 0);
     setSteps(0);
     setShowConfetti(false);
     const baseNumbers = Array.from({ length: uniqueCount }, (_, i) => i + 1);
@@ -272,8 +258,9 @@ export default function Tiles() {
     setMatched(Array(shuffled.length).fill(false));
     setFlipped(Array(shuffled.length).fill(false));
     setOpenTiles([]);
-    setTimeLeft(0);
-    saveGame();
+    setTimeLeft(isSuperHard ? 100 : 0);
+    runBoardAppearAnimation();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
   return (
@@ -292,10 +279,25 @@ export default function Tiles() {
           autoStart={true}
         />
       )}
-      <Pressable onPress={() => router.back()} style={styles.menuButton}>
+      <Pressable
+        onPress={() => {
+          clearInterval(timerRef.current);
+          setTimerActive(false);
+          router.push("/");
+        }}
+        style={styles.menuButton}
+      >
         <Text style={styles.menuText}>←</Text>
       </Pressable>
-      <View style={[styles.container]}>
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            transform: [{ scale: boardScale }],
+            opacity: boardOpacity,
+          },
+        ]}
+      >
         <View style={styles.infoRow}>
           <Text style={styles.infoText}>⏱ {timeLeft}s</Text>
           <Text style={styles.infoText}>🪜 Steps: {steps}</Text>
@@ -327,6 +329,7 @@ export default function Tiles() {
                   {
                     opacity: flipped[index] || matched[index] ? 1 : 0,
                     color: theme.text,
+                    fontSize: tileSize * 0.4,
                   },
                 ]}
               >
@@ -338,7 +341,7 @@ export default function Tiles() {
         <Pressable style={styles.resetButton} onPress={handleReset}>
           <Text style={styles.resetButtonText}>Reset Game</Text>
         </Pressable>
-      </View>
+      </Animated.View>
     </ImageBackground>
   );
 }
@@ -396,8 +399,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   letter: {
-    fontSize: 40,
     fontWeight: "600",
+    textAlign: "center",
   },
   resetButton: {
     marginTop: 30,

@@ -1,7 +1,9 @@
-import { useRouter } from "expo-router";
-import { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import {
+  Animated,
+  Easing,
   ImageBackground,
   Pressable,
   StyleSheet,
@@ -9,29 +11,53 @@ import {
   View,
 } from "react-native";
 
-import useBackgroundMusic from "../hooks/useBackgroundMusic";
 import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
+import useBackgroundMusic from "../hooks/useBackgroundMusic";
 
 export default function HomeScreen() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(true);
   const [sfxOn, setSfxOn] = useState(true);
+  const [musicVolume, setMusicVolume] = useState(1);
   const [theme, setTheme] = useState("light");
-  const [musicVolume, setMusicVolume] = useState(0.5);
-  const [hasSave, setHasSave] = useState(false);
+
+  useEffect(() => {
+    async function loadSettings() {
+      const s = await AsyncStorage.getItem("soundOn");
+      const fx = await AsyncStorage.getItem("sfxOn");
+      const vol = await AsyncStorage.getItem("musicVolume");
+      const th = await AsyncStorage.getItem("appTheme");
+
+      if (s !== null) setSoundOn(s === "true");
+      if (fx !== null) setSfxOn(fx === "true");
+      if (vol !== null) setMusicVolume(Number(vol));
+      if (th !== null) setTheme(th);
+    }
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.setItem("soundOn", soundOn.toString());
+    AsyncStorage.setItem("sfxOn", sfxOn.toString());
+    AsyncStorage.setItem("musicVolume", musicVolume.toString());
+    AsyncStorage.setItem("appTheme", theme);
+  }, [soundOn, sfxOn, musicVolume, theme]);
+
+  const menuSlide = useRef(new Animated.Value(-200)).current;
+
+  const [bestScore, setBestScore] = useState(null);
+
   useBackgroundMusic(soundOn, musicVolume);
 
   const clickSound = useRef(null);
 
   useEffect(() => {
     async function loadClick() {
-      clickSound.current = (await Audio.Sound.createAsync(
-        require("../assets/sounds/click.wav")
-      )).sound;
+      clickSound.current = (
+        await Audio.Sound.createAsync(require("../assets/sounds/click.wav"))
+      ).sound;
     }
     loadClick();
     return () => {
@@ -60,90 +86,89 @@ export default function HomeScreen() {
 
   useEffect(() => {
     async function loadSettings() {
-      const savedSound = await AsyncStorage.getItem("soundOn");
-      const savedSfx = await AsyncStorage.getItem("sfxOn");
-      if (savedSound !== null) setSoundOn(savedSound === "true");
-      if (savedSfx !== null) setSfxOn(savedSfx === "true");
-      const savedVolume = await AsyncStorage.getItem("musicVolume");
-      if (savedVolume !== null) setMusicVolume(parseFloat(savedVolume));
-      const savedTheme = await AsyncStorage.getItem("appTheme");
-      if (savedTheme) setTheme(savedTheme);
-      const savedGame = await AsyncStorage.getItem("savedGame");
-      if (savedGame) setHasSave(true);
+      const best = await AsyncStorage.getItem("bestScore");
+      if (best) setBestScore(best);
     }
     loadSettings();
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      async function checkSavedGame() {
-        const saved = await AsyncStorage.getItem("savedGame");
-        setHasSave(!!saved);
-      }
-      checkSavedGame();
-    }, [])
-  );
-
-  useEffect(() => {
-    AsyncStorage.setItem("soundOn", soundOn.toString());
-    AsyncStorage.setItem("sfxOn", sfxOn.toString());
-    AsyncStorage.setItem("musicVolume", musicVolume.toString());
-  }, [soundOn, sfxOn, musicVolume]);
-
   return (
     <ImageBackground
       source={require("../assets/images/bg.jpg")}
-      style={styles.bg}
+      style={styles.bgFull}
       resizeMode="cover"
     >
-      {/* Hamburger Menu */}
-      <Pressable
-        style={styles.menuButton}
-        onPress={() => { playClick(); setMenuOpen(!menuOpen); }}
-      >
-        <Text style={styles.menuText}>☰</Text>
-      </Pressable>
+      <View style={styles.screenContent}>
+        {/* Hamburger Menu */}
+        <Pressable
+          style={styles.menuButton}
+          onPress={() => {
+            playClick();
+            setMenuOpen(!menuOpen);
+            Animated.timing(menuSlide, {
+              toValue: menuOpen ? -200 : 0,
+              duration: 300,
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: false,
+            }).start();
+          }}
+        >
+          <Text style={styles.menuText}>☰</Text>
+        </Pressable>
 
-      {menuOpen && (
-        <View style={styles.menuPanel}>
-          <Pressable
-            style={styles.menuItem}
-            onPress={() => { playClick(); setSoundOn(!soundOn); }}
-          >
-            <Text style={styles.menuItemText}>
-              {soundOn ? "Sound: ON" : "Sound: OFF"}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={styles.menuItem}
-            onPress={() => { playClick(); setSfxOn(!sfxOn); }}
-          >
-            <Text style={styles.menuItemText}>
-              {sfxOn ? "SFX: ON" : "SFX: OFF"}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={styles.menuItem}
-            onPress={async () => {
-              playClick();
-              const newTheme = theme === "light" ? "dark" : "light";
-              setTheme(newTheme);
-              await AsyncStorage.setItem("appTheme", newTheme);
-            }}
-          >
-            <Text style={styles.menuItemText}>
-              Theme: {theme === "light" ? "Light" : "Dark"}
-            </Text>
-          </Pressable>
-        </View>
-      )}
+        {menuOpen && (
+          <Animated.View style={[styles.menuPanel, { left: menuSlide }]}>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => {
+                playClick();
+                setSoundOn(!soundOn);
+              }}
+            >
+              <Text style={styles.menuItemText}>
+                {soundOn ? "Sound: ON" : "Sound: OFF"}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => {
+                playClick();
+                setSfxOn(!sfxOn);
+              }}
+            >
+              <Text style={styles.menuItemText}>
+                {sfxOn ? "SFX: ON" : "SFX: OFF"}
+              </Text>
+            </Pressable>
+            <Pressable
+              style={styles.menuItem}
+              onPress={async () => {
+                playClick();
+                const newTheme = theme === "light" ? "dark" : "light";
+                setTheme(newTheme);
+                await AsyncStorage.setItem("appTheme", newTheme);
+              }}
+            >
+              <Text style={styles.menuItemText}>
+                Theme: {theme === "light" ? "Light" : "Dark"}
+              </Text>
+            </Pressable>
+          </Animated.View>
+        )}
 
-      {/* Game Title */}
-      <Text style={styles.title}>TILES QUEST</Text>
+        {/* Game Title */}
+        <View style={{ height: 40 }} />
+        <Text style={styles.title}>TILES QUEST</Text>
 
-      {/* Buttons */}
-      <View style={styles.buttonContainer}>
-        {!hasSave && (
+        {bestScore && (
+          <View style={styles.leaderboardCard}>
+            <Text style={styles.leaderboardTitle}>🏆 BEST SCORE</Text>
+            <Text style={styles.leaderboardValue}>{bestScore}</Text>
+          </View>
+        )}
+
+        {/* Buttons */}
+        <View style={styles.buttonContainer}>
           <Pressable
             style={styles.button}
             onPress={() => {
@@ -153,47 +178,36 @@ export default function HomeScreen() {
           >
             <Text style={styles.buttonText}>NEW GAME</Text>
           </Pressable>
-        )}
 
-        {hasSave && (
           <Pressable
             style={styles.button}
             onPress={() => {
               playClick();
-              router.push({
-                pathname: "/game",
-                params: { continueGame: "true" },
-              });
+              router.push("/difficulty");
             }}
           >
-            <Text style={styles.buttonText}>CONTINUE GAME</Text>
+            <Text style={styles.buttonText}>DIFFICULTY</Text>
           </Pressable>
-        )}
-
-        <Pressable
-          style={styles.button}
-          onPress={() => { playClick(); router.push("/difficulty"); }}
-        >
-          <Text style={styles.buttonText}>DIFFICULTY</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.button}
-          onPress={() => { playClick(); router.push("/settings"); }}
-        >
-          <Text style={styles.buttonText}>SETTINGS</Text>
-        </Pressable>
-
+        </View>
       </View>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  bg: {
+  bgFull: {
     flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  screenContent: {
+    flex: 1,
+    paddingTop: 120,
     alignItems: "center",
     justifyContent: "center",
+  },
+  bg: {
+    flex: 1,
   },
   menuButton: {
     position: "absolute",
@@ -212,16 +226,18 @@ const styles = StyleSheet.create({
     fontSize: 38,
     fontWeight: "900",
     color: "#fff",
-    marginBottom: 50,
+    marginBottom: 30,
+    marginTop: -20,
     textShadowColor: "rgba(0,0,0,0.7)",
     textShadowOffset: { width: 3, height: 3 },
     textShadowRadius: 8,
     letterSpacing: 3,
   },
   buttonContainer: {
-    width: "80%",
+    width: "85%",
     alignItems: "center",
-    gap: 20,
+    gap: 30,
+    marginTop: 10,
   },
   button: {
     width: "65%",
@@ -258,5 +274,24 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "600",
+  },
+  leaderboardCard: {
+    backgroundColor: "rgba(0,0,0,0.55)",
+    padding: 12,
+    borderRadius: 14,
+    marginBottom: 30,
+    width: "70%",
+    alignItems: "center",
+  },
+  leaderboardTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  leaderboardValue: {
+    color: "#ffeb3b",
+    fontSize: 22,
+    fontWeight: "800",
   },
 });
