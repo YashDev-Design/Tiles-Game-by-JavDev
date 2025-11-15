@@ -1,50 +1,118 @@
-# Welcome to your Expo app 👋
+# 🎮 Tiles Game by JavDev (Yash)  
+A polished, fully‑interactive memory puzzle game built with **React Native + Expo** featuring modern UI, sound design, animations, auto‑save, and theme support.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## ✨ Current Features (Fully Implemented)
 
-## Get started
+### 🧩 Core Gameplay  
+- Flip tiles to find matching pairs  
+- Smooth tile flip animations  
+- Timer countdown  
+- Step counter  
+- Confetti celebration on win  
+- Auto-clear saved game on win/reset  
 
-1. Install dependencies
+### 🔊 Sound System  
+- iOS‑style **click sound** for all UI buttons, toggles, back arrows  
+- **Match sound** when each tile flips  
+- **Win sound** synced with confetti  
+- Haptic feedback for all SFX  
+- Global SFX ON/OFF toggle  
+- Stable-safe audio playback (no “seeking interrupted” errors)  
 
-   ```bash
-   npm install
-   ```
+### 🎵 Background Music  
+- Smooth fading background music  
+- Volume slider  
+- Music ON/OFF toggle  
+- Auto-save settings using AsyncStorage  
 
-2. Start the app
+### 💾 Auto Save & Continue  
+- Game auto-saves after every move, match, mismatch, and reset  
+- Home screen shows **Continue Game** if a saved game exists  
+- Restores:
+  - numbers  
+  - flipped state  
+  - matched tiles  
+  - steps  
+  - timer  
+  - difficulty mode  
 
-   ```bash
-   npx expo start
-   ```
+### 🎨 Theme System  
+- Menu toggle for **Light / Dark** theme  
+- Theme saved permanently using AsyncStorage  
 
-In the output, you'll find options to open the app in a
+### 🧭 Navigation  
+- Home Screen  
+- Difficulty Selection  
+- Game Screen  
+- Settings Screen  
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📁 Project Structure
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+/app
+  home.jsx
+  difficulty.jsx
+  settings.jsx
+  game.jsx
+/components
+  TilesGame.jsx
+/assets
+  /sounds
+    click.wav
+    match.wav
+    confetti-pop.mp3
+  /images …
+/hooks
+  useBackgroundMusic.js
+/context
+  Audio settings (optional future expansion)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 🚀 How to Run the Project
 
-To learn more about developing your project with Expo, look at the following resources:
+1. Install dependencies:
+```bash
+npm install
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+2. Start development server:
+```bash
+npx expo start
+```
 
-## Join the community
+3. Open on:
+- iOS Simulator  
+- Android Emulator  
+- Expo Go app  
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🛠 Technologies Used  
+- React Native  
+- Expo  
+- Expo Router  
+- Expo AV  
+- Expo Haptics  
+- AsyncStorage  
+- Lottie / Confetti  
+- GitHub for version control  
+
+---
+
+## 📌 Upcoming Enhancements  
+- Theme engine for tiles + board  
+- Pause/Resume gameplay  
+- Leaderboard (Best Time / Best Steps)  
+- Additional animations  
+
+---
+
+## 👨‍💻 Developed by  
+**Yash (JavDev)**  
+AUM Graduate Student • Full‑Stack Mobile Developer • UI/UX Focus  
+https://github.com/YashDev-Design
+
